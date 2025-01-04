@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<options>
+    <option ID="Option_KnowThePlan_RequireTelepathy" Require="Option_KnowThePlan_AllCompanions==Yes"
+        DisplayText="Require telepathy to disable abilities"
+        Category="Mod: You Already Know the Plan" Type="Checkbox" Default="No">
+        <helptext>Requires restart</helptext>
+    </option>
+    <option ID="Option_KnowThePlan_UseEnergy"
+        DisplayText="Use energy to disable abilities"
+        Category="Mod: You Already Know the Plan" Type="Checkbox" Default="No">
+        <helptext>Treats this like a normal companion instruction, with time passing. Telepathy discount applies like normal. Requires restart.</helptext>
+    </option>
+    <option ID="Option_KnowThePlan_AllCompanions"
+        DisplayText="Apply disabled abilities to all companions, not just clones"
+        Category="Mod: You Already Know the Plan" Type="Checkbox" Default="No">
+        <helptext>Requires restart</helptext>
+    </option>
+    <option ID="Option_KnowThePlan_ClearList" DisplayText="Reset the list of forbidden abilities"
+        Category="Mod: You Already Know the Plan"
+        Type="Button" OnClick="KnowThePlan.Options.Clear">
+        <helptext>Applies immediately</helptext>
+    </option>
+</options>

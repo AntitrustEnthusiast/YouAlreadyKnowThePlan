@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<commands>
+    <command
+        ID="CmdDisableForClones"
+        DisplayText="Disable for {{Y-Y-Y-Y-Y-M|clones}"
+        Category="Menus"
+        Layer="Menus"
+        Auto="DownPass">
+        <keyboardBind Modifier="ctrl" Key="c" />
+        <gamepadBind Button="leftStickPress" />
+    </command>
+</commands>
