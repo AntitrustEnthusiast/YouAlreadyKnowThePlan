@@ -57,7 +57,7 @@ namespace KnowThePlan
             // check if user even wants telepathy requirement
             if (!Options.RequireTelepathy) { return true; }
             // check if leader/follower qualify for telepathy if requirement enabled
-            if (!Leader.HasPart<Telepathy>()) { return false; }
+            if (!Leader.HasPart<XRL.World.Parts.Mutation.Telepathy>()) { return false; }
             return Leader.CanMakeTelepathicContactWith(Follower);
         }
 
