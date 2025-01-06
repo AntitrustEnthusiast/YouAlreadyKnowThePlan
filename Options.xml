@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <options>
-    <option ID="Option_KnowThePlan_RequireTelepathy" Require="Option_KnowThePlan_AllCompanions==Yes"
+    <option ID="Option_KnowThePlan_RequireTelepathy"
         DisplayText="Require telepathy to disable abilities"
         Category="Mod: You Already Know the Plan" Type="Checkbox" Default="No">
         <helptext>Requires restart</helptext>
