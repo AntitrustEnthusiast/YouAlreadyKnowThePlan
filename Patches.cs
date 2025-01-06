@@ -1,3 +1,4 @@
+using System;
 using HarmonyLib;
 
 using Qud.UI;
@@ -85,8 +86,9 @@ namespace KnowThePlan
 
         static void Postfix(AbilityManagerLine __instance)
         {
-            AbilityManagerLine.Context? context = (AbilityManagerLine.Context)(__instance?.GetNavigationContext());
-            ActivatedAbilityEntry? entry = context?.data?.ability;
+            AbilityManagerLine.Context context = (AbilityManagerLine.Context)(__instance?.GetNavigationContext());
+            if (context is null) { return; }
+            ActivatedAbilityEntry entry = context?.data?.ability;
             if (entry is null)
             {
                 UnityEngine.Debug.LogError("Could not find ActivatedAbilityEntry");
