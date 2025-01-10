@@ -20,4 +20,14 @@
         Type="Button" OnClick="KnowThePlan.Options.Clear">
         <helptext>Applies immediately</helptext>
     </option>
+    <option ID="Option_KnowThePlan_RemoveThrownSlot" DisplayText="Remove the thrown weapon slot when spawning clones"
+        Category="Mod: You Already Know the Plan"
+        Type="Checkbox" Default="No">
+        <helptext>Requires restart</helptext>
+    </option>
+    <option ID="Option_KnowThePlan_ShowCompanionThrownToggle" DisplayText="Toggle thrown weapon slot from companion menu"
+        Category="Mod: You Already Know the Plan"
+        Type="Checkbox" Default="No">
+        <helptext>Adds an entry to the companion management menu to remove/add the thrown weapon slot. Requires restart</helptext>
+    </option>
 </options>

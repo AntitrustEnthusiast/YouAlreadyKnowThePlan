@@ -1,12 +1,12 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
 using SerializeField = UnityEngine.SerializeField;
 
 using XRL;
-using XRL.UI;
 using XRL.World;
+using XRL.World.Parts;
+using XRL.World.Anatomy;
 
 namespace KnowThePlan
 {
@@ -51,6 +51,72 @@ namespace KnowThePlan
         }
     }
 
+    public static class ThrownWeaponSlot
+    {
+        public static string RemovedSlotKey = "KnowThePlan_RemovedSlotCount";
+
+        // does not check if slot already exists, just adds 1-2 based on cybernetics
+        public static void AddThrownWeaponSlot(GameObject GO)
+        {
+            Body body = GO.Body;
+            if (body is null)
+            {
+                // UnityEngine.Debug.LogError("tried to add slot to companion with no body");
+                return;
+            }
+
+            // default to 1 to account for the thrown weapon slot every(?) creature gets
+            int slotCount = GO.GetIntPropertyIfSet(RemovedSlotKey) ?? 1;
+            BodyPart bodyPart = body.GetBody();
+            for (int i = 0; i < slotCount; i++)
+            {
+                // UnityEngine.Debug.Log($"Adding thrown weapon slot {i + 1}");
+                bodyPart.AddPartAt("Thrown Weapon", 0, (string)null, (string)null, (string)null, (string)null, "KnowThePlan::ThrownWeaponSlot", (int?)null, (int?)null, (int?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, "Thrown Weapon", (string)null, DoUpdate: true);
+            }
+        }
+
+        // returns the number of slots removed for later re-adding
+        public static int RemoveThrownWeaponSlot(GameObject GO)
+        {
+            Body body = GO.Body;
+            if (body is null)
+            {
+                UnityEngine.Debug.LogError("tried to remove thrown weapon slot from companion with no body");
+                return 0;
+            }
+            BodyPart thrownSlot = body.GetFirstPart("Thrown Weapon");
+            int counter = 0;
+            while (thrownSlot is not null)
+            {
+                counter++;
+                // UnityEngine.Debug.Log($"Attempting to remove thrown weapon slot #{counter}");
+                body.RemovePart(thrownSlot);
+                if (counter >= 30) { return -1; }
+                thrownSlot = body.GetFirstPart("Thrown Weapon");
+            }
+            GO.SetIntProperty(RemovedSlotKey, counter);
+            return counter;
+        }
+
+        public static BodyPart GetThrownWeaponSlot(Body body)
+        {
+            BodyPart thrownWeaponSlot = body.GetFirstPart("Thrown Weapon");
+            return thrownWeaponSlot;
+        }
+
+        public static bool HasThrownWeaponSlot(GameObject GO )
+        {
+            Body body = GO.Body;
+            if (body is null) { return false; }
+            return (GetThrownWeaponSlot(body) is not null);
+        }
+
+        public static void HandleThrownWeapons(GameObject Follower)
+        {
+            if (!Options.RemoveThrownWeaponSlot) { return; }
+            RemoveThrownWeaponSlot(Follower);
+        }
+    }
 
     class Options
     {
@@ -72,7 +138,7 @@ namespace KnowThePlan
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError("Error clearing list:");
+                UnityEngine.Debug.LogError("Know The Plan: Error clearing list of forbidden abilities:");
                 UnityEngine.Debug.LogError(e.Message);
             }
         }
@@ -80,6 +146,8 @@ namespace KnowThePlan
         public static bool AllCompanions = GetOption("Option_KnowThePlan_AllCompanions").EqualsNoCase("Yes");
         public static bool RequireTelepathy = GetOption("Option_KnowThePlan_RequireTelepathy").EqualsNoCase("Yes");
         public static bool UseEnergy = GetOption("Option_KnowThePlan_UseEnergy").EqualsNoCase("Yes");
+        public static bool RemoveThrownWeaponSlot = GetOption("Option_KnowThePlan_RemoveThrownSlot").EqualsNoCase("Yes");
+        public static bool ShowCompanionThrownToggle = GetOption("Option_KnowThePlan_ShowCompanionThrownToggle").EqualsNoCase("Yes");
 
         public static ForbiddenAbilities Forbidden => The.Game.RequireSystem(() => new ForbiddenAbilities());
     }

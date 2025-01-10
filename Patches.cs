@@ -5,7 +5,6 @@ using Qud.UI;
 
 using XRL.World;
 using XRL.World.Parts;
-using XRL.World.Parts.Mutation;
 
 namespace KnowThePlan
 {
@@ -15,7 +14,7 @@ namespace KnowThePlan
         // the goal here is to forbid each item in the list every time the player gets a new follower
         [HarmonyPostfix]
         [HarmonyPatch("SetPartyLeader")]
-        static void Postfix(Brain __instance, GameObject Object, int Flags = 0, bool Transient = false)
+        public static void Postfix(Brain __instance, GameObject Object, int Flags = 0, bool Transient = false)
         {
             // we only care about player followers
             if (Object is null || !Object.IsPlayer()) { return; }
@@ -25,6 +24,7 @@ namespace KnowThePlan
             if (!CheckClone(Object, follower)) { return; }
             if (!CheckTelepathy(Object, follower)) { return; }
             if (!CheckEnergy(Object, follower)) { return; }
+            ThrownWeaponSlot.HandleThrownWeapons(follower);
 
             // iterate over the list of abilities and disable for follower
             ActivatedAbilities abilities = follower.ActivatedAbilities;
@@ -35,25 +35,15 @@ namespace KnowThePlan
             }
         }
 
-        static void DisableAbility(ActivatedAbilityEntry Ability)
-        {
-            if (Ability is null) { return; }
-            if (Ability.Toggleable && Ability.ToggleState)
-            {
-                Ability.ToggleState = false;
-            }
-            Ability.AIDisable = true;
-        }
-
         // returns false if execution should stop, true otherwise
-        static bool CheckClone(GameObject Leader, GameObject Follower)
+        public static bool CheckClone(GameObject Leader, GameObject Follower)
         {
             if (Options.AllCompanions) { return true; }
             return Follower.GetStringProperty("CloneOf") == Leader.ID;
         }
 
         // returns false if execution should stop, true otherwise
-        static bool CheckTelepathy(GameObject Leader, GameObject Follower)
+        public static bool CheckTelepathy(GameObject Leader, GameObject Follower)
         {
             // check if user even wants telepathy requirement
             if (!Options.RequireTelepathy) { return true; }
@@ -63,11 +53,21 @@ namespace KnowThePlan
         }
 
         // returns false if execution should stop, true otherwise
-        static bool CheckEnergy(GameObject Leader, GameObject Follower)
+        public static bool CheckEnergy(GameObject Leader, GameObject Follower)
         {
             if (!Options.UseEnergy) { return true; }
             Leader.CompanionDirectionEnergyCost(Follower, 100, "Forbidden Abilities");
             return true;
+        }
+
+        public static void DisableAbility(ActivatedAbilityEntry Ability)
+        {
+            if (Ability is null) { return; }
+            if (Ability.Toggleable && Ability.ToggleState)
+            {
+                Ability.ToggleState = false;
+            }
+            Ability.AIDisable = true;
         }
     }
 
@@ -77,7 +77,6 @@ namespace KnowThePlan
     [HarmonyPatch(typeof(Qud.UI.AbilityManagerLine), nameof(Qud.UI.AbilityManagerLine.SetupContexts))]
     public static class AbilityManagerLine_DisableForCloneCommand
     {
-        public const int FLAG_AI_DISABLE = XRL.World.Parts.ActivatedAbilityEntry.FLAG_AI_DISABLE;
         public const string ALLOW_WORD = "Allow for {{Y-Y-Y-Y-Y-M|clones}}";
         public const string FORBID_WORD = "Forbid for {{Y-Y-Y-Y-Y-M|clones}}";
 
