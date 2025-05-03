@@ -20,14 +20,22 @@
         Type="Button" OnClick="KnowThePlan.Options.Clear">
         <helptext>Applies immediately</helptext>
     </option>
-    <option ID="Option_KnowThePlan_RemoveThrownSlot" DisplayText="Remove the thrown weapon slot when spawning clones"
+    <option ID="Option_KnowThePlan_RemoveThrownSlot" DisplayText="Remove the thrown weapon slot(s) when spawning clones"
+        Category="Mod: You Already Know the Plan"
+        Type="Checkbox" Default="No">
+        <helptext>Requires restart</helptext>
+    </option><option ID="Option_KnowThePlan_RemoveMissileSlot" DisplayText="Remove the missile weapon slot(s) when spawning clones (experimental)"
         Category="Mod: You Already Know the Plan"
         Type="Checkbox" Default="No">
         <helptext>Requires restart</helptext>
     </option>
-    <option ID="Option_KnowThePlan_ShowCompanionThrownToggle" DisplayText="Toggle thrown weapon slot from companion menu"
+    <option ID="Option_KnowThePlan_ShowCompanionThrownToggle" DisplayText="Toggle thrown weapon slot(s) from companion menu"
         Category="Mod: You Already Know the Plan"
         Type="Checkbox" Default="No">
-        <helptext>Adds an entry to the companion management menu to remove/add the thrown weapon slot. Requires restart</helptext>
+        <helptext>Adds an entry to the companion management menu to remove/add the thrown weapon slot(s). Requires restart</helptext>
+    </option><option ID="Option_KnowThePlan_ShowCompanionMissileToggle" DisplayText="Toggle missile weapon slot(s) from companion menu"
+        Category="Mod: You Already Know the Plan"
+        Type="Checkbox" Default="No">
+        <helptext>Adds an entry to the companion management menu to remove/add the missile weapon slot(s). Requires restart</helptext>
     </option>
 </options>

@@ -42,17 +42,20 @@ namespace KnowThePlan
     // https://github.com/Kizby/Clever-Girl
     class KnowThePlan_PlayerListener : IPart
     {
-        private string _actionName = "Already Know The Plan - Toggle Thrown";
-        private string _command = "KnowThePlan_ToggleThrown";
+        private string _throwActionName = "Already Know The Plan - Toggle Thrown";
+        private string _missileActionName = "Already Know The Plan - Toggle Missile Weapons";
+        private string _throwCommand = "KnowThePlan_ToggleThrown";
+        private string _missileCommand = "KnowThePlan_ToggleMissile";
 
         public override bool WantEvent(int ID, int cascade) =>
             base.WantEvent(ID, cascade) ||
             ID == OwnerGetInventoryActionsEvent.ID ||
             ID == InventoryActionEvent.ID;
 
+        // adds menu items for restoring slots
         public override bool HandleEvent(OwnerGetInventoryActionsEvent E)
         {
-            if (!Options.ShowCompanionThrownToggle) { return true; }
+            if (!Options.ShowCompanionThrownToggle && !Options.ShowCompanionMissileToggle) { return true; }
             if ((E.Object is null) || E.Object.IsPlayer() || !E.Actor.IsPlayer()) { return true; }
             if (E.Object.IsPlayerLed() != true) { return true; }
 
@@ -62,14 +65,18 @@ namespace KnowThePlan
                 return true;
             }
             bool hasThrownWeaponSlot = ThrownWeaponSlot.HasThrownWeaponSlot(E.Object);
-            string displayName = $"{(hasThrownWeaponSlot ? "forbid" : "allow")} throwing weapons";
-            _ = E.AddAction(_actionName, displayName, _command, Key: 'W', FireOnActor: true, WorksAtDistance: true);
+            string throwDisplayName = $"{(hasThrownWeaponSlot ? "forbid" : "allow")} throwing weapons";
+            _ = E.AddAction(_throwActionName, throwDisplayName, _throwCommand, Key: 'W', FireOnActor: true, WorksAtDistance: true);
+            bool hasMissileWeaponSlot = ThrownWeaponSlot.HasMissileWeaponSlot(E.Object);
+            string missileDisplayName = $"{(hasMissileWeaponSlot ? "forbid" : "allow")} missile weapons";
+            _ = E.AddAction(_missileActionName, missileDisplayName, _missileCommand, Key: 'M', FireOnActor: true, WorksAtDistance: true);
             return true;
         }
 
+        // handle slot restore/remove events
         public override bool HandleEvent(InventoryActionEvent E)
         {
-            if (E.Command == _command && ParentObject.CheckCompanionDirection(E.Item))
+            if (E.Command == _throwCommand && ParentObject.CheckCompanionDirection(E.Item))
             {
                 if (ThrownWeaponSlot.HasThrownWeaponSlot(E.Item))
                 {
@@ -80,6 +87,19 @@ namespace KnowThePlan
                     ThrownWeaponSlot.AddThrownWeaponSlot(E.Item);
                 }
                 ParentObject.CompanionDirectionEnergyCost(E.Item, 100, "Manage Thrown Weapon Plan");
+                E.RequestInterfaceExit();
+            }
+            else if (E.Command == _missileCommand && ParentObject.CheckCompanionDirection(E.Item))
+            {
+                if (ThrownWeaponSlot.HasMissileWeaponSlot(E.Item))
+                {
+                    ThrownWeaponSlot.RemoveMissileWeaponSlot(E.Item);
+                }
+                else
+                {
+                    ThrownWeaponSlot.AddMissileWeaponSlot(E.Item);
+                }
+                ParentObject.CompanionDirectionEnergyCost(E.Item, 100, "Manage Missile Weapon Plan");
                 E.RequestInterfaceExit();
             }
             return true;

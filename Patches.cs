@@ -25,6 +25,7 @@ namespace KnowThePlan
             if (!CheckTelepathy(Object, follower)) { return; }
             if (!CheckEnergy(Object, follower)) { return; }
             ThrownWeaponSlot.HandleThrownWeapons(follower);
+            ThrownWeaponSlot.HandleMissileWeapons(follower);
 
             // iterate over the list of abilities and disable for follower
             ActivatedAbilities abilities = follower.ActivatedAbilities;

@@ -53,7 +53,8 @@ namespace KnowThePlan
 
     public static class ThrownWeaponSlot
     {
-        public static string RemovedSlotKey = "KnowThePlan_RemovedSlotCount";
+        public static string RemovedThrownKey = "KnowThePlan_RemovedThrownCount";
+        public static string RemovedMissileKey = "KnowThePlan_RemovedMissileCount";
 
         // does not check if slot already exists, just adds 1-2 based on cybernetics
         public static void AddThrownWeaponSlot(GameObject GO)
@@ -66,12 +67,32 @@ namespace KnowThePlan
             }
 
             // default to 1 to account for the thrown weapon slot every(?) creature gets
-            int slotCount = GO.GetIntPropertyIfSet(RemovedSlotKey) ?? 1;
+            int slotCount = GO.GetIntPropertyIfSet(RemovedThrownKey) ?? 1;
             BodyPart bodyPart = body.GetBody();
             for (int i = 0; i < slotCount; i++)
             {
                 // UnityEngine.Debug.Log($"Adding thrown weapon slot {i + 1}");
                 bodyPart.AddPartAt("Thrown Weapon", 0, (string)null, (string)null, (string)null, (string)null, "KnowThePlan::ThrownWeaponSlot", (int?)null, (int?)null, (int?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, "Thrown Weapon", (string)null, DoUpdate: true);
+            }
+        }
+
+        // does not check if slot already exists, just adds
+        public static void AddMissileWeaponSlot(GameObject GO)
+        {
+            Body body = GO.Body;
+            if (body is null)
+            {
+                // UnityEngine.Debug.LogError("tried to add slot to companion with no body");
+                return;
+            }
+
+            // default to 1 to account for the thrown weapon slot every(?) creature gets
+            int slotCount = GO.GetIntPropertyIfSet(RemovedMissileKey) ?? 1;
+            BodyPart bodyPart = body.GetBody();
+            for (int i = 0; i < slotCount; i++)
+            {
+                // UnityEngine.Debug.Log($"Adding missile weapon slot {i + 1}");
+                bodyPart.AddPartAt("Missile Weapon", 0, (string)null, (string)null, (string)null, (string)null, "KnowThePlan::MissileWeaponSlot", (int?)null, (int?)null, (int?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, (bool?)null, "Missile Weapon", (string)null, DoUpdate: true);
             }
         }
 
@@ -94,7 +115,30 @@ namespace KnowThePlan
                 if (counter >= 30) { return -1; }
                 thrownSlot = body.GetFirstPart("Thrown Weapon");
             }
-            GO.SetIntProperty(RemovedSlotKey, counter);
+            GO.SetIntProperty(RemovedThrownKey, counter);
+            return counter;
+        }
+
+         // returns the number of slots removed for later re-adding
+        public static int RemoveMissileWeaponSlot(GameObject GO)
+        {
+            Body body = GO.Body;
+            if (body is null)
+            {
+                UnityEngine.Debug.LogError("tried to remove missile weapon slot from companion with no body");
+                return 0;
+            }
+            BodyPart missileSlot = body.GetFirstPart("Missile Weapon");
+            int counter = 0;
+            while (missileSlot is not null)
+            {
+                counter++;
+                // UnityEngine.Debug.Log($"Attempting to remove thrown weapon slot #{counter}");
+                body.RemovePart(missileSlot);
+                if (counter >= 30) { return -1; }
+                missileSlot = body.GetFirstPart("Missile Weapon");
+            }
+            GO.SetIntProperty(RemovedMissileKey, counter);
             return counter;
         }
 
@@ -102,6 +146,19 @@ namespace KnowThePlan
         {
             BodyPart thrownWeaponSlot = body.GetFirstPart("Thrown Weapon");
             return thrownWeaponSlot;
+        }
+
+        public static BodyPart GetMissileWeaponSlot(Body body)
+        {
+            BodyPart missileWeaponSlot = body.GetFirstPart("Missile Weapon");
+            return missileWeaponSlot;
+        }
+
+        public static bool HasMissileWeaponSlot(GameObject GO )
+        {
+            Body body = GO.Body;
+            if (body is null) { return false; }
+            return (GetMissileWeaponSlot(body) is not null);
         }
 
         public static bool HasThrownWeaponSlot(GameObject GO )
@@ -115,6 +172,12 @@ namespace KnowThePlan
         {
             if (!Options.RemoveThrownWeaponSlot) { return; }
             RemoveThrownWeaponSlot(Follower);
+        }
+
+        public static void HandleMissileWeapons(GameObject Follower)
+        {
+            if (!Options.RemoveMissileWeaponSlot) { return; }
+            RemoveMissileWeaponSlot(Follower);
         }
     }
 
@@ -147,7 +210,9 @@ namespace KnowThePlan
         public static bool RequireTelepathy = GetOption("Option_KnowThePlan_RequireTelepathy").EqualsNoCase("Yes");
         public static bool UseEnergy = GetOption("Option_KnowThePlan_UseEnergy").EqualsNoCase("Yes");
         public static bool RemoveThrownWeaponSlot = GetOption("Option_KnowThePlan_RemoveThrownSlot").EqualsNoCase("Yes");
+        public static bool RemoveMissileWeaponSlot = GetOption("Option_KnowThePlan_RemoveMissileSlot").EqualsNoCase("Yes");
         public static bool ShowCompanionThrownToggle = GetOption("Option_KnowThePlan_ShowCompanionThrownToggle").EqualsNoCase("Yes");
+        public static bool ShowCompanionMissileToggle = GetOption("Option_KnowThePlan_ShowCompanionMissileToggle").EqualsNoCase("Yes");
 
         public static ForbiddenAbilities Forbidden => The.Game.RequireSystem(() => new ForbiddenAbilities());
     }
